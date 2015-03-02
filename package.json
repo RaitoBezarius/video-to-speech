@@ -1,0 +1,30 @@
+{
+  "name": "video-to-speech",
+  "version": "0.0.1",
+  "description": "See README.md.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RaitoBezarius/video-to-speech.git"
+  },
+  "keywords": [
+    "mobile",
+    "speech",
+    "video",
+    "realtime",
+    "ocr"
+  ],
+  "author": "Ryan LAHFA",
+  "license": "GPLv2",
+  "bugs": {
+    "url": "https://github.com/RaitoBezarius/video-to-speech/issues"
+  },
+  "homepage": "https://github.com/RaitoBezarius/video-to-speech",
+  "dependencies": {
+    "socket.io": "^1.3.4"
+  }
+}
