@@ -13,4 +13,4 @@ The process is quite simple. I would like to improve it :
 - Quick OCR and speech synthesis (like it would be *realtime*?).
 - Better accessibilities methods and support. (It's very poorly written, I know.)
 
-
+The code is released under licence GPLv2, for more information, please look at the file LICENCE.
