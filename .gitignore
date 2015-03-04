@@ -1,3 +1,6 @@
 # Old caches images
 *.jpg
 *.png
+
+# Modules
+node_modules
