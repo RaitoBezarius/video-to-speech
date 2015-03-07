@@ -1,6 +1,10 @@
 Ideas (maybe naive) and to-do list.
 ===================================
 
+## Usage
+
+- Make OCR results better.
+
 ## Make a Gulp process
 
 - Spawn a dev server.
