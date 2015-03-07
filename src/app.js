@@ -1,38 +1,74 @@
-var default_voice = speechSynthesis.getVoices().filter(function (voice) {
-    return voice.lang === 'fr-FR';
-})[0];
+(function() {
+    var streaming = false;
+    var video = document.querySelector('#video');
+    var canvas = document.querySelector('#canvas');
+    var height = 0;
+    var width = 320;
+    var tts_audio = document.querySelector('#audio');
 
-var socket = io.connect('http://localhost:9600/');
+    navigator.getMedia = (navigator.getUserMedia ||
+        navigator.webkitGetUserMedia ||
+        navigator.mozGetUserMedia ||
+        navigator.msGetUserMedia);
 
-function readMessage(text) {
-    var msg = new SpeechSynthesisUtterance();
-    msg.voice = default_voice;
-    msg.voiceURI = 'native';
-    msg.volume = 1;
-    msg.rate = 1;
-    msg.pitch = 2;
-    msg.text = text;
-    msg.lang = 'fr-FR';
+    navigator.getMedia({
+            video: true,
+            audio: false
+        },
+        function(stream) {
+            if (navigator.mozGetUserMedia) {
+                video.mozSrcObject = stream;
+            } else {
+                var vendorURL = window.URL || window.webkitURL;
+                video.src = vendorURL.createObjectURL(stream);
+            }
 
-    speechSynthesis.speak(msg);
-}
+            video.play();
+        },
+        function(err) {
+            console.log("Une erreur est survenue!");
+        }
+    );
 
-socket.emit('connect');
-socket.on('ack', function () {
-    console.log('Connected to the back-end.');
-})
-socket.on('result', function (message) {
-    console.log('Received text message. (' + message + ')');
-    readMessage(message.substr(0, 40));
-});
+    video.addEventListener('canplay', function(ev) {
+        if (!streaming) {
+            height = video.videoHeight / (video.videoWidth / width);
+            video.setAttribute('width', width);
+            video.setAttribute('height', height);
+            canvas.setAttribute('width', width);
+            canvas.setAttribute('height', height);
+            streaming = true;
+        }
+    }, false);
 
-var send_button = document.getElementById('send');
-send_button.addEventListener('click', function (ev) {
-    console.log('Sending file...');
-    sendFile(document.getElementById('file').files[0]);
-});
+    function takePicture() {
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(video, 0, 0, width, height);
+        pushImage(width, height, canvas.toDataURL());
+    }
 
-function sendBlob(blob) {
-    console.log('Now sending blob to server.');
-    socket.emit('text-image', blob);
-}
+    var socket = io.connect('http://localhost:9600/');
+
+    socket.emit('connect');
+    socket.on('ack', function() {
+        console.log('Connected to the back-end.');
+    })
+    socket.on('result', function(audioUrl) {
+        console.log('Received audio message url.');
+        tts_audio.src = audioUrl;
+        tts_audio.load();
+        tts_audio.play();
+        console.log("Playing the audio...");
+    });
+
+    var send_button = document.getElementById('send');
+    send_button.addEventListener('click', function(ev) {
+        takePicture();
+    });
+
+    function pushImage(width, height, imgdata) {
+        console.log('Now sending blob to server.');
+        socket.emit('text-image', width, height, imgdata);
+    }
+})();
